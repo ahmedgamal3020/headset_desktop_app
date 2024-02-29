@@ -29,6 +29,7 @@ class App(CTk):
     
 
 app = App()
+app.iconbitmap("assets\icon-headset_87991.ico")
 app.title('Headset System')
 app.resize_window()
 app.mainloop()

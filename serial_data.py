@@ -104,22 +104,25 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                       # editing.details_about(app,parent_hight,parent_width,frame,search_text)
         else:
             print('ahmedssss')
+    
     def toggle_checkbox1(*args):
         if checkbox1_var.get():
             checkbox2_var.set(False)
-
+    
     def toggle_checkbox2(*args):
         if checkbox2_var.get():
             checkbox1_var.set(False)
+    
     def but():
-       if entry_var.get()!=None:
+        if entry_var.get().strip().replace(' ','')!='' or entry_var2.get().strip().replace(' ','')!='':
+            
             if checkbox1_var.get():
-                if entry_var.get().strip().replace(' ','').lower() in list(data['serial']):
+                if entry_var.get().strip().replace(' ','').lower() in list(data['serial'].str.lower()):
                     existsText.grid(row=5, column=0, sticky="wen", padx=10,pady=10)
                 else:
                     sql=(f"""
                         insert into headset (status,serial,name,agent_id,date,headset_type)
-                        VALUES ('availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','Plantrasonic')
+                        VALUES ('availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
                             
                                     """)
 
@@ -127,14 +130,17 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                     cursor.execute(query=sql)
                     cursor.execute('commit')
                     label_6.grid_forget()
+                    successText.grid(row=5,column=0,padx=10,pady=10,sticky='wen')
                     cl.refresh_data(self)
             elif checkbox2_var.get():
-                if entry_var.get().strip().replace(' ','').lower() in list(data['serial']):
+                
+                if entry_var.get().strip().replace(' ','').lower() in list(data['serial'].str.lower()):
                     existsText.grid(row=5, column=0, sticky="wen", padx=10,pady=10)
                 else:
+                    
                     sql=(f"""
                         insert into headset (status,serial,name,agent_id,date,headset_type)
-                        VALUES ('not availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','Plantrasonic')
+                        VALUES ('not availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
                             
                                     """)
 
@@ -143,11 +149,15 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                     cursor.execute(query=sql)
                     cursor.execute('commit')
                     label_6.grid_forget()
+                    successText.grid(row=5,column=0,padx=10,pady=10,sticky='wen')
                     cl.refresh_data(self)
+                    
             else:
-               
+                emptyText.grid_forget()
                 label_6.grid(row=5,column=0,padx=10,pady=10,sticky='wen')
-      
+        else:
+           
+            emptyText.grid(row=5,column=0,padx=10,pady=10,sticky='wen')
         
     checkbox1_var = tk.BooleanVar()
     checkbox2_var = tk.BooleanVar()
@@ -182,23 +192,33 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
     label_3= CTkLabel(master=sub_frame,text='Add New Serial',corner_radius=0,font=font_1)
     label_3.grid(row=0,column=0,columnspan=2,padx=10,pady=10,sticky='wen')
 
+    lab1 = CTkLabel(master=sub_frame,text='serial',font=CTkFont(size=10) ,corner_radius=0,) 
+    lab1.grid(row=1,column=0,padx=10,sticky='w')
+    lab2 = CTkLabel(master=sub_frame,text='headset type',font=CTkFont(size=10), corner_radius=0) 
+    lab2.grid(row=1,column=1,padx=10,sticky='w')
+
     label_4 = CTkEntry(master=sub_frame,placeholder_text='Serial',textvariable= entry_var, corner_radius=0,) 
-    label_4.grid(row=1,column=0,padx=10,pady=10,sticky='w')
+    label_4.grid(row=2,column=0,padx=10,pady=(0,10),sticky='w')
 
     label_5 = CTkEntry(master=sub_frame,placeholder_text='headset type',textvariable= entry_var2, corner_radius=0) 
-    label_5.grid(row=1,column=1,padx=10,pady=10,sticky='e')
+    label_5.grid(row=2,column=1,padx=10,pady=(0,10),sticky='e')
 
     
     checkbox1 =CTkCheckBox(master=sub_frame, text="Availble", variable=checkbox1_var, command=toggle_checkbox1)
     checkbox2 = CTkCheckBox(master=sub_frame, text="Not Availble", variable=checkbox2_var, command=toggle_checkbox2)
 
-    checkbox1.grid(row=2,column=0,padx=(40,),pady=10,sticky='w')
-    checkbox2.grid(row=2,column=1,padx=(0,40),pady=10,sticky='e')
+    checkbox1.grid(row=3,column=0,padx=(40,),pady=10,sticky='w')
+    checkbox2.grid(row=3,column=1,padx=(0,40),pady=10,sticky='e')
     button = CTkButton(master=frame, 
                         text='add',command= but) 
     button.grid(row=4,column=0,padx=10,pady=10,sticky='wen')
     label_6= CTkLabel(master=frame,text='add status ',text_color='red')
-    existsText = CTkLabel(frame,text='this serial is already exists or the field is empty  ',text_color='red')
+    existsText = CTkLabel(frame,text='this serial is already exists',text_color='red')
+    successText= CTkLabel(frame,text='Successfully',text_color='green')
+    emptyText = CTkLabel(frame,text='the field is empty ',text_color='red')
+    
+
+
     return frame
 
 

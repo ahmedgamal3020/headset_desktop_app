@@ -19,6 +19,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
     cl= dashboard.Dashboard
     connection=cl.connection
     cursor=cl.cursor
+    
     american_n = StringVar()
     american_n.set(american_name)
     ser = StringVar()
@@ -34,8 +35,11 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
     font_1 = CTkFont(family="arial", weight="bold", size=40)
     font2 = CTkFont(family="arial", size=30)
     current_date =dt_string
-    
+    cl.headset_data=pd.read_sql(''' select * from headset
+
+                               ''',cl.engine)
     def update_but():
+            cl.headset_data=cl.headset_data
             print(serial)
             m=ent2.get().strip().replace(' ', '').lower()
             print(f'{m}') 
@@ -43,7 +47,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
             new_serial=cl.headset_data[cl.headset_data['serial'].str.lower().isin([f'{m}'])]
             print(new_serial)
             if ent2.get()==serial or not('availble' in list(new_serial['status'].str.lower())) :
-                existsText = CTkLabel(frame,text='this serial is already in used or not exists',font=font2,text_color='red')
+                existsText = CTkLabel(frame,text='this serial is already in use or not exists',font=font2,text_color='red')
                 existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
             elif ent2.get()=='':
                 existsText = CTkLabel(frame,text='serial field must be not empty',font=font2,text_color='red')
@@ -103,85 +107,91 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                 tabs.configure("Dashboard")
        
     def add_but():
+       
         x=ent2.get().strip().replace(' ', '').lower()
-        print('ds '+f'{x}')
+
         new_serial=cl.headset_data[cl.headset_data['serial'].str.lower().isin([f'{x}'])]
         print(new_serial)
-        print((cl.headset_data['serial'].str.lower()[0]))
         if ent1.get().lower() in list(cl.headset_data['status'].str.lower()):
             existsText = CTkLabel(frame,text='This name already exists',font=font2,text_color='red')
             existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
-        elif ent1.get()=='' or ent2.get()=='' or ent3.get()==''or ent4.get()==''or ent5.get()==''or ent6.get()=='':
+        elif ent1.get().strip().replace(' ','')=='' or ent2.get().strip().replace(' ','')=='' or ent3.get().strip().replace(' ','')=='' or ent4.get().strip().replace(' ','')=='' or ent5.get().strip().replace(' ','')=='' or ent6.get().strip().replace(' ','')=='':
              existsText = CTkLabel(frame,text='all fields must be not empty',font=font2,text_color='red')
              existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
-        elif 'availble' in list(new_serial['status'].str.lower()):
-            print(f'{x}')
-
-            sql=(f"""
+            
+        elif  'availble' in list(new_serial['status'].str.lower()) :
+                
+                sql=(f"""
                     update headset 
                     set status='{ent1.get()}',serial='{ent2.get().strip().replace(' ', '')}',name='{ent3.get()}',agent_id='{ent4.get().strip().replace(' ', '')}',date='{ent5.get().strip().replace(' ', '')}',headset_type='{ent6.get().strip().replace(' ', '')}'
-                        where  lower(serial)='{ent2.get().strip().replace(' ', '').lower()}' 
+                        where lower(serial) ='{ent2.get().strip().replace(' ', '').lower()}'
                             """)
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
 
-            sql=(f"""
+                connection.commit()
+                cursor.execute(query=sql)
+                cursor.execute('commit')
+                # connection.close()
+                # cursor.close()
+                sql=(f"""
                     insert into serial_hestory (serial,agent_name,first_date,last_date)
                     VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
                             """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+                connection.commit()
+                cursor.execute(query=sql)
+                cursor.execute('commit')
 
-            ent1.delete(0,END)
-            ent2.delete(0,END)
-            ent3.delete(0,END)
-            ent4.delete(0,END)
-            ent5.delete(0,END)
-            ent6.delete(0,END)
-            
-            cl.refresh_data(self)
+                ent1.delete(0,END)
+                ent2.delete(0,END)
+                ent3.delete(0,END)
+                ent4.delete(0,END)
+                ent5.delete(0,END)
+                ent6.delete(0,END)
+                
+                cl.refresh_data(self)
 
-            tabs.set("Dashboard")
-            tabs.configure("Dashboard")
-            
+                tabs.set("Dashboard")
+                tabs.configure("Dashboard")
+        elif  'not availble' in list(new_serial['status'].str.lower()) : 
+            existsText = CTkLabel(frame,text='this serial not availble',font=font2,text_color='red')
+            existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
+        elif  not('not availble' in list(new_serial['status'].str.lower())) and not('availble' in list(new_serial['status'].str.lower())) and ent2.get().strip().replace(' ','').lower() in list(cl.headset_data['serial'].str.lower()) : 
+            existsText = CTkLabel(frame,text='this serial is already exists',font=font2,text_color='red')
+            existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
+        elif  not(ent2.get().strip().replace(' ','').lower() in list(cl.headset_data['status'].str.lower())) :
+
+            existsText = CTkLabel(frame,text='this serial not exists',font=font2,text_color='red')
+            existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
         else:
 
-            sql=(f"""
-                insert into headset (status,serial,name,agent_id,date,headset_type)
-                VALUES ('{ent1.get()}','{ent2.get().strip().replace(' ', '')}','{ent3.get()}','{ent4.get().strip().replace(' ', '')}','{ent5.get().strip().replace(' ', '')}','{ent6.get().strip().replace(' ', '')}')
+            existsText = CTkLabel(frame,text='this serial not exists or not availble',font=font2,text_color='red')
+            existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
+
+
+            # sql=(f"""
+            #     insert into headset (status,serial,name,agent_id,date,headset_type)
+            #     VALUES ('{ent1.get()}','{ent2.get().strip().replace(' ', '')}','{ent3.get()}','{ent4.get().strip().replace(' ', '')}','{ent5.get().strip().replace(' ', '')}','{ent6.get().strip().replace(' ', '')}')
                        
-                            """)
+            #                 """)
 
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            # cursor.execute(query=sql)
+            # cursor.execute('commit')
 
-            sql=(f"""
-                    insert into serial_hestory (serial,agent_name,first_date,last_date)
-                    VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
-                            """)
+            # sql=(f"""
+            #         insert into serial_hestory (serial,agent_name,first_date,last_date)
+            #         VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
+            #                 """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            # connection.commit()
+            # cursor.execute(query=sql)
+            # cursor.execute('commit')
 
-            ent1.delete(0,END)
-            ent2.delete(0,END)
-            ent3.delete(0,END)
-            ent4.delete(0,END)
-            ent5.delete(0,END)
-            ent6.delete(0,END)
-            
-            cl.refresh_data(self)
-
-            tabs.set("Dashboard")
-            tabs.configure("Dashboard")
+           
             
         # else:
         #     existsText = CTkLabel(frame,text='This serial is not exist',font=font2,text_color='red')
         #     existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
+ 
        
     def delete_but():
     
@@ -218,6 +228,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
         cl.refresh_data(self)
 
         tabs.set("Dashboard")
+
 
     frame = CTkFrame(master=app)
     frame.pack(pady=40, padx=100, fill="both", expand=True)
