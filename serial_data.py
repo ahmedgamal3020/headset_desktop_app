@@ -13,7 +13,6 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
     connection=cl.connection
     cursor=cl.cursor
     serial_hestory=pd.read_sql(''' select * from serial_hestory
-
                                ''',cl.engine)
     serial_hestory['serial']=serial_hestory['serial'].str.upper()
     data['serial']=data['serial'].str.upper()
@@ -23,7 +22,6 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
     font_1 = CTkFont(family="arial", weight="bold", size=40)
 
     def filter_list(event):
-        
         search_text = label_1.get().lower()
         filtered_list = [item for item in serialData if search_text in item.lower()]
         listbox.delete(0, tk.END)
@@ -31,7 +29,6 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
             listbox.insert(tk.END, item) 
         if len(filtered_list)==len(serialData):
             listbox.config(height=10)
-            print('y')
             empty_label()
         elif len(filtered_list)<=35:
             listbox.config(height=listbox.size())
@@ -43,9 +40,8 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
             listbox.config(height=0)
 
    
-            # editing.details_about(app,parent_hight,parent_width,frame,selected_item)
     
-    def sun_frame(status): 
+    def sun_frame(status):
             
             agent=list(status['agent_name'])
             print(agent)
@@ -101,7 +97,6 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
             status.reset_index(inplace=True,level=False)
             print(status)
             sun_frame(status=status)
-                      # editing.details_about(app,parent_hight,parent_width,frame,search_text)
         else:
             print('ahmedssss')
     
@@ -114,7 +109,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
             checkbox1_var.set(False)
     
     def but():
-        if entry_var.get().strip().replace(' ','')!='' or entry_var2.get().strip().replace(' ','')!='':
+        if entry_var.get().strip().replace(' ','')!='' and entry_var2.get().strip().replace(' ','')!='':
             
             if checkbox1_var.get():
                 if entry_var.get().strip().replace(' ','').lower() in list(data['serial'].str.lower()):
@@ -122,7 +117,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                 else:
                     sql=(f"""
                         insert into headset (status,serial,name,agent_id,date,headset_type)
-                        VALUES ('availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
+                        VALUES ('available','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
                             
                                     """)
 
@@ -140,7 +135,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                     
                     sql=(f"""
                         insert into headset (status,serial,name,agent_id,date,headset_type)
-                        VALUES ('not availble','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
+                        VALUES ('not available','{entry_var.get().strip().replace(' ', '')}','-','-','-','{entry_var2.get().strip().replace(' ', '')}')
                             
                                     """)
 
@@ -204,8 +199,8 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
     label_5.grid(row=2,column=1,padx=10,pady=(0,10),sticky='e')
 
     
-    checkbox1 =CTkCheckBox(master=sub_frame, text="Availble", variable=checkbox1_var, command=toggle_checkbox1)
-    checkbox2 = CTkCheckBox(master=sub_frame, text="Not Availble", variable=checkbox2_var, command=toggle_checkbox2)
+    checkbox1 =CTkCheckBox(master=sub_frame, text="Available", variable=checkbox1_var, command=toggle_checkbox1)
+    checkbox2 = CTkCheckBox(master=sub_frame, text="Not Available", variable=checkbox2_var, command=toggle_checkbox2)
 
     checkbox1.grid(row=3,column=0,padx=(40,),pady=10,sticky='w')
     checkbox2.grid(row=3,column=1,padx=(0,40),pady=10,sticky='e')

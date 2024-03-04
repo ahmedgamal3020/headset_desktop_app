@@ -128,9 +128,9 @@ class Dashboard(CTkFrame):
         self.data['status']=self.data['status'].str.title()
         self.data['name']=self.data['name'].str.title()
         self.data['headset_type']=self.data['headset_type'].str.strip().replace(' ','').str.title()
-        self.working=self.data[~self.data.status.isin(['Availble','Not Availble'])]
-        self.avalible=self.data[self.data.status.isin(['Availble'])]
-        self.not_avalible=self.data[self.data.status.isin(['Not Availble'])]
+        self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
+        self.avalible=self.data[self.data.status.isin(['Available'])]
+        self.not_avalible=self.data[self.data.status.isin(['Not Available'])]
         self.dataa=self.working['status'].unique()
         self.work=self.working
         self.tabview.add("Dashboard")
@@ -207,7 +207,7 @@ class Dashboard(CTkFrame):
             row=1, column=1, sticky="wnse", padx=(0, 10), pady=(0, 10)
         )
         self.label3 = CTkLabel(
-            master=self.frame_child2, text="Availble", font=self.cus_font
+            master=self.frame_child2, text="Available", font=self.cus_font
         )
         self.label3.pack(pady=(10, 0))
         self.total3 = CTkLabel(
@@ -220,7 +220,7 @@ class Dashboard(CTkFrame):
             row=1, column=2, sticky="wnse", padx=(0, 10), pady=(0, 10)
         )
         self.label4 = CTkLabel(
-            master=self.frame_child3, text="Not availble", font=self.cus_font
+            master=self.frame_child3, text="Not available", font=self.cus_font
         )
         self.label4.pack(pady=(10, 0))
         self.total4 = CTkLabel(
@@ -289,9 +289,9 @@ class Dashboard(CTkFrame):
 
             self.label51 = CTkLabel(master=self.frame_child5,text='Working',font=self.cus_font2)
             self.label51.grid(row=i+1,column=0,padx=5,pady=5)
-            self.label52 = CTkLabel(master=self.frame_child5,text='Availble',font=self.cus_font2)
+            self.label52 = CTkLabel(master=self.frame_child5,text='Available',font=self.cus_font2)
             self.label52.grid(row=i+1,column=1,padx=5,pady=5)
-            self.label53 = CTkLabel(master=self.frame_child5,text='Not availble',font=self.cus_font2)
+            self.label53 = CTkLabel(master=self.frame_child5,text='Not available',font=self.cus_font2)
             self.label53.grid(row=i+1,column=2,padx=5,pady=5)
             w=self.working[self.working['headset_type'].isin([headset_type[i]])].shape[0]
             v=self.avalible[self.avalible['headset_type'].isin([headset_type[i]])].shape[0]
@@ -316,9 +316,9 @@ class Dashboard(CTkFrame):
         self.data['status']=self.data['status'].str.title()
         self.data['name']=self.data['name'].str.title()
         self.data['headset_type']=self.data['headset_type'].str.title()
-        self.working=self.data[~self.data.status.isin(['Availble','Not Availble'])]
-        self.avalible=self.data[self.data.status.isin(['Availble'])]
-        self.not_avalible=self.data[self.data.status.isin(['Not Availble'])]
+        self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
+        self.avalible=self.data[self.data.status.isin(['Available'])]
+        self.not_avalible=self.data[self.data.status.isin(['Not Avaialble'])]
         self.dataa=self.working['status'].unique()
         self.work=self.working
 
@@ -338,12 +338,12 @@ class Dashboard(CTkFrame):
            )
         return  self.new_data
 
-    uri = "postgresql://postgres:%s@192.168.5.30/headset" % quote_plus("123321")
+    uri = "postgresql://postgres:%s@localhost/postgres" % quote_plus("123321")
     engine = create_engine(uri)
 
     headset_data = pd.read_sql('''
         select * from headset
         ''',engine)
     connection = psycopg2.connect(
-    database="headset", user="postgres", password="123321", host="192.168.5.30", port="5432")
+    database="postgres", user="postgres", password="123321", host="localhost", port="5432")
     cursor = connection.cursor()
