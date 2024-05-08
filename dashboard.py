@@ -10,7 +10,7 @@ import psycopg2
 
 
 class Dashboard(CTkFrame):
-    
+    print('refresh')
     def filter_list(self,event):
         search_text = self.sreach_1.get().lower()
         
@@ -112,6 +112,7 @@ class Dashboard(CTkFrame):
             data=self.data,
            )
         self.sreach_1.delete(0,END)
+        self.refresh_data()
 
     def __init__(self, app, parent_hight, parent_width, old_frame=""):
         self.parent_hight = parent_hight
@@ -127,6 +128,7 @@ class Dashboard(CTkFrame):
         self.dataa=[]
         self.data['status']=self.data['status'].str.title()
         self.data['name']=self.data['name'].str.title()
+        self.data['serial']=self.data['serial'].str.title()
         self.data['headset_type']=self.data['headset_type'].str.strip().replace(' ','').str.title()
         self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
         self.avalible=self.data[self.data.status.isin(['Available'])]
@@ -155,7 +157,9 @@ class Dashboard(CTkFrame):
     
     def create_widgets(self):
         self.frame = CTkFrame(master=self.tabview.tab("Dashboard"))
+        
         self.frame.pack(pady=10, padx=10, fill="both", expand=True)
+        
         self.frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
         self.frame.grid_rowconfigure((0, 1), weight=0)
         self.frame.grid_rowconfigure((2), weight=1)
@@ -163,7 +167,7 @@ class Dashboard(CTkFrame):
         # small_frames_width = (parent_width-120-20)*1/3
 
         self.cus_font = CTkFont(family="arial", weight="bold", size=40)
-        self.cus_font2 = CTkFont(family="arial", weight="bold", size=30)
+        self.cus_font2 = CTkFont(family="arial", weight="bold", size=20)
         self.img = Image.open(
             r"assets\pngimg.com - headphones_PNG101962.png"
         )
@@ -171,7 +175,7 @@ class Dashboard(CTkFrame):
             self.img,
             size=(self.parent_width * 0.15, self.parent_hight * 0.15),
         )
-
+    
         # ###############################################image######################################################
         self.frame_image = CTkFrame(master=self.frame, fg_color="transparent")
         self.frame_image.grid(row=0, column=0, sticky="wnse", padx=10, pady=(10, 10))
@@ -259,7 +263,7 @@ class Dashboard(CTkFrame):
                             )
 
         self.button = CTkButton(
-            master=self.frame_child4, font=CTkFont(family="bold", size=30),command=lambda: self.but(), text="add!"
+            master=self.frame_child4,fg_color='transparent',border_color='#2986CC',border_width=1,font=self.cus_font2, command=lambda: self.but(), text="add!"
         )
         self.button.grid(row=3, column=0, sticky="s", padx=10, pady=10)
 
@@ -308,6 +312,7 @@ class Dashboard(CTkFrame):
 
     def refresh_data(self):
         # Retrieve new data from the database
+        print('refresh')
         self.new_data =  pd.read_sql('''
             select * from headset
             ''',self.engine)
@@ -315,10 +320,11 @@ class Dashboard(CTkFrame):
         self.data=self.new_data
         self.data['status']=self.data['status'].str.title()
         self.data['name']=self.data['name'].str.title()
+        self.data['serial']=self.data['serial'].str.title()
         self.data['headset_type']=self.data['headset_type'].str.title()
         self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
         self.avalible=self.data[self.data.status.isin(['Available'])]
-        self.not_avalible=self.data[self.data.status.isin(['Not Avaialble'])]
+        self.not_avalible=self.data[self.data.status.isin(['Not Available'])]
         self.dataa=self.working['status'].unique()
         self.work=self.working
 
@@ -335,15 +341,16 @@ class Dashboard(CTkFrame):
             self.parent_hight,
             self.parent_width,
             data=self.new_data,
+        
            )
-        return  self.new_data
+        return self.new_data
 
-    uri = "postgresql://postgres:%s@localhost/postgres" % quote_plus("123321")
+    uri = "postgresql://postgres:%s@192.168.5.30/headset" % quote_plus("123321")
     engine = create_engine(uri)
 
     headset_data = pd.read_sql('''
         select * from headset
         ''',engine)
     connection = psycopg2.connect(
-    database="postgres", user="postgres", password="123321", host="localhost", port="5432")
+    database="headset", user="postgres", password="123321", host="192.168.5.30", port="5432")
     cursor = connection.cursor()

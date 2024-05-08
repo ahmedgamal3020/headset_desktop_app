@@ -4,7 +4,7 @@ from urllib.parse import quote_plus
 import pandas as pd
 from sqlalchemy.engine import create_engine
 
-uri = "postgresql://postgres:%s@localhost/postgres" % quote_plus("123321")
+uri = "postgresql://postgres:%s@192.168.5.30/headset" % quote_plus("123321")
 engine = create_engine(uri)
 login_data = pd.read_sql('''
         select * from login
