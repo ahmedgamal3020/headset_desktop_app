@@ -345,12 +345,12 @@ class Dashboard(CTkFrame):
            )
         return self.new_data
 
-    uri = "postgresql://postgres:%s@192.168.5.30/headset" % quote_plus("123321")
+    uri = "postgresql://postgres:%s@192.168.4.204/headset" % quote_plus("123321")
     engine = create_engine(uri)
 
     headset_data = pd.read_sql('''
         select * from headset
         ''',engine)
     connection = psycopg2.connect(
-    database="headset", user="postgres", password="123321", host="192.168.5.30", port="5432")
+    database="headset", user="postgres", password="123321", host="192.168.4.204", port="5432")
     cursor = connection.cursor()
