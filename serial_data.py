@@ -88,7 +88,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
                 delete_but=CTkButton(frame_child5,text='X',fg_color='transparent',hover_color='red',font=font_1,command=lambda: delete_serial(serial_name))  
                 delete_but.grid(row=0,column=1,sticky='e',padx=(10),pady=10) 
 
-    def serial_filter_list(event):
+    def serial_filter_list(event=""):
         
         search_text = label_1.get().lower()
         filtered_list = [item for item in serialData if search_text in item.lower()]
@@ -162,7 +162,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
          date_frame.grid_rowconfigure((0,1,2,3,4),weight=1)
          date_frame.grid(row=3, column=1,rowspan=5,sticky='wens',pady=10,padx=(0,10)) 
          
-    def serial_on_selects(event):
+    def serial_on_selects(event=""):
         serial_empty_label
         selected_index2 = listbox2.curselection()
     
@@ -363,7 +363,7 @@ def getmeframe(self,app,tabs ,parent_hight, parent_width,data, frame="", ):
     
     
 
-
+    
     return frame
 
 

@@ -7,10 +7,15 @@ from urllib.parse import quote_plus
 import pandas as pd
 from sqlalchemy.engine import create_engine
 import psycopg2
+from datetime import datetime
+now = datetime.now()
+dt_string = now.strftime("%Y/%m/%d")
 
 
 class Dashboard(CTkFrame):
-    print('refresh')
+    
+    
+    
     def filter_list(self,event):
         search_text = self.sreach_1.get().lower()
         
@@ -44,9 +49,7 @@ class Dashboard(CTkFrame):
         selected_index = self.listbox.curselection()
         if selected_index and selected_item != '':
             selected_item = self.listbox.get(selected_index[0])
-            self.agent_data=self.work[self.work['status'].isin([selected_item])]
-            print(self.agent_data)
-            print('---',selected_item)
+            self.agent_data=self.work[self.work['agent_id'].isin([selected_item])]
             self.editing_frame.pack_forget()
             self.editing_frame = editing.details_about(
             self,
@@ -61,25 +64,28 @@ class Dashboard(CTkFrame):
             headset_type=''.join (self.agent_data['headset_type'])
 
             )
+            self.tabview.set("Editing")
+            self.sreach_1.delete(0,END)
             
         else:
             pass  
 
         
-        self.tabview.set("Editing")
+       
         
     def press_enter(self,event):
 
         search_text = self.sreach_1.get().lower()
         listbox_item=self.listbox.get(0).lower()
         if search_text ==listbox_item :
-            self.agent_d=self.work[self.work['status'].isin([listbox_item.title()])]
-            print(self.agent_d)
+            self.agent_d=self.work[self.work['agent_id'].isin([listbox_item.title()])]
+
             self.editing_frame.pack_forget()
             self.editing_frame = editing.details_about(
             self,
             self.tabview.tab("Editing"),
             self.tabview,
+            dt_string=dt_string,
             frame="",
             american_name=''.join (self.agent_d['status']),
             serial=''.join (self.agent_d['serial']),
@@ -113,7 +119,48 @@ class Dashboard(CTkFrame):
            )
         self.sreach_1.delete(0,END)
         self.refresh_data()
-
+    
+    def show_toast(message):
+        pass
+    def remove_levers(self):
+        self.connection
+        levers=self.headset_data[self.headset_data['agent_id'].isin(self.levers)]
+        levs=str("""','""".join( levers['agent_id']))
+        # self.headset_data=self.headset_data[~self.headset_data['status'].isin(self.levers)]
+        mess=f'Leavers removed : {levers.shape[0]}'
+        self.show_toast()
+        sql_query = f"""update headset SET status='available' WHERE agent_id IN('{levs}')"""
+        sql_query = f"""update serial_hestory SET last_date='{dt_string}' WHERE agent_name IN('{levs}')"""
+        self.cursor.execute(sql_query)
+        self.connection.commit()
+        self.refresh_data()
+        duration=3000
+        # Create a top-level window
+        toast = tk.Toplevel()
+        toast.wm_overrideredirect(True)  # Remove window decorations (border, close button, etc.)
+        
+        # Get the screen width and height
+        screen_width = toast.winfo_screenwidth()
+        screen_height = toast.winfo_screenheight()
+        
+        # Set the dimensions and position of the toast
+        width = 300
+        height = 50
+        x = (screen_width // 2) - (width // 2)  # Center horizontally
+        y = screen_height  - height -50  # Center buttomly
+        toast.geometry(f"{width}x{height}+{x}+{y}")
+        
+        # Create a label to display the message
+        label = tk.Label(toast, text=mess, bg="black", fg="white", font=("Helvetica", 12))
+        label.pack(expand=True, fill='both')
+        
+        # Make the window semi-transparent
+        toast.attributes("-alpha", 0.8)
+        
+        # Destroy the toast after the specified duration
+        toast.after(duration, toast.destroy)
+        
+        
     def __init__(self, app, parent_hight, parent_width, old_frame=""):
         self.parent_hight = parent_hight
         self.parent_width = parent_width
@@ -133,7 +180,7 @@ class Dashboard(CTkFrame):
         self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
         self.avalible=self.data[self.data.status.isin(['Available'])]
         self.not_avalible=self.data[self.data.status.isin(['Not Available'])]
-        self.dataa=self.working['status'].unique()
+        self.dataa=self.working['agent_id'].unique()
         self.work=self.working
         self.tabview.add("Dashboard")
         self.tabview.add("Editing")
@@ -163,13 +210,12 @@ class Dashboard(CTkFrame):
         self.frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
         self.frame.grid_rowconfigure((0, 1), weight=0)
         self.frame.grid_rowconfigure((2), weight=1)
-        # small_frames_hight = (parent_hight-80)*1/4
-        # small_frames_width = (parent_width-120-20)*1/3
+      
 
         self.cus_font = CTkFont(family="arial", weight="bold", size=40)
         self.cus_font2 = CTkFont(family="arial", weight="bold", size=20)
         self.img = Image.open(
-            r"assets\pngimg.com - headphones_PNG101962.png"
+            r"assets/pngimg.com - headphones_PNG101962.png"
         )
         self.imag = CTkImage(
             self.img,
@@ -307,9 +353,17 @@ class Dashboard(CTkFrame):
             self.label532 = CTkLabel(master=self.frame_child5,text=f'{nv}',font=self.cus_font2)
             self.label532.grid(row=i+2,column=2,padx=5,pady=5)
 
-    
+        thred_frame=CTkFrame(master=self.frame,fg_color='transparent')
+        thred_frame.grid(
+            row=3,
+            column=0,columnspan=3, sticky="w", pady=(0, 10)
+        )
+        remove_button=CTkButton(master=thred_frame,fg_color='transparent',border_color='#2986CC',border_width=1,
+                        text='Remove leavers',command=lambda: self.remove_levers(),font=self.cus_font2) 
+        remove_button.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
+        
         self.frame.pack()
-
+        
     def refresh_data(self):
         # Retrieve new data from the database
         print('refresh')
@@ -325,7 +379,7 @@ class Dashboard(CTkFrame):
         self.working=self.data[~self.data.status.isin(['Available','Not Available'])]
         self.avalible=self.data[self.data.status.isin(['Available'])]
         self.not_avalible=self.data[self.data.status.isin(['Not Available'])]
-        self.dataa=self.working['status'].unique()
+        self.dataa=self.working['agent_id'].unique()
         self.work=self.working
 
         self.frame.forget()
@@ -354,3 +408,10 @@ class Dashboard(CTkFrame):
     connection = psycopg2.connect(
     database="headset", user="postgres", password="123321", host="192.168.4.204", port="5432")
     cursor = connection.cursor()
+    try:
+        levers=pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vSqnEbChd9UdQLAXWsFdWq0D6bqzWqXqprDcSBvQXczhu5ayehqtTreHcxTE5SuNAJmZaflZfwk-30C/pub?gid=1785867491&single=true&output=csv',low_memory=False,encoding='utf-8',usecols=['Column1']) 
+        levers=levers['Column1'].unique()
+        
+    except Exception as e:
+        levers=None
+   

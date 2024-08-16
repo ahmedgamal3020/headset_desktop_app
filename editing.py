@@ -1,17 +1,13 @@
-from tkinter import StringVar
 from customtkinter import *
-import datetime 
 import  dashboard 
-from urllib.parse import quote_plus
 import pandas as pd
-from sqlalchemy.engine import create_engine
-from datetime import datetime
-now = datetime.now()
+
 import tkinter as tk
-dt_string = now.strftime("%Y/%m/%d")
+
    
 
-def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id='',date='',headset_type=''):
+
+def details_about(self,app,tabs,dt_string='' ,frame="",american_name='',serial='',name='',id='',date='',headset_type=''):
     if frame == "":
         pass
     else:
@@ -20,24 +16,33 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
     cl= dashboard.Dashboard
     connection=cl.connection
     cursor=cl.cursor
+    def commit(sql):
+        connection.commit()
+        cursor.execute(query=sql)
+        cursor.execute('commit')
+      
     
-    american_n = StringVar()
+    american_n = tk.StringVar()
     american_n.set(american_name)
-    ser = StringVar()
+    ser = tk.StringVar()
     ser.set(serial)
     na = StringVar()
     na.set(name)
-    agent_id = StringVar()
+    agent_id = tk.StringVar()
     agent_id.set(id)
-    da = StringVar()
+    da = tk.StringVar()
     da.set(date)
-    type = StringVar()
+    type = tk.StringVar()
     type.set(headset_type)
     font_1 = CTkFont(family="arial", weight="bold", size=40)
     font2 = CTkFont(family="arial", size=30)
     current_date =dt_string
-    cl.headset_data=pd.read_sql(''' select * from headset
-
+    cl.headset_data=pd.read_sql(''' select
+                                 serial,
+                                status,
+                                agent_id,
+                                date,
+                                name from headset
                                ''',cl.engine)
     checkbox1_var = tk.BooleanVar()
     checkbox2_var = tk.BooleanVar()
@@ -57,9 +62,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     set status='available',serial='{serial}',name='-',agent_id='-',date='-'
                         where  lower(serial)='{serial.strip().replace(' ', '').lower()}' 
                             """)
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
             
             sql=(f"""
@@ -68,9 +71,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     where  lower(serial)='{serial.strip().replace(' ', '').lower()}' and lower(agent_name)='{ent1.get().lower()}' 
                         """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
 
             ent1.delete(0,END)
@@ -90,9 +91,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     set status='not available',serial='{serial}',name='-',agent_id='-',date='-'
                         where  lower(serial)='{serial.strip().replace(' ', '').lower()}' 
                         """)
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
            
 
@@ -102,9 +101,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     where  lower(serial)='{serial.strip().replace(' ', '').lower()}' and lower(agent_name)='{ent1.get().lower()}' 
                         """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
 
             
@@ -132,28 +129,21 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     set status='available',serial='{serial}',name='-',agent_id='-',date='-'
                         where  lower(serial)='{serial.strip().replace(' ', '').lower()}' 
                             """)
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
             sql=(f"""
                     insert into serial_hestory (serial,agent_name,first_date,last_date)
                     VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
                             """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
             sql=(f"""
                 update serial_hestory 
                 set last_date='{current_date}'
                     where  lower(serial)='{serial.strip().replace(' ', '').lower()}' and lower(agent_name)='{ent1.get().lower()}' 
                         """)
-
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
 
             sql=(f"""
@@ -162,11 +152,8 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     where lower(serial) ='{ent2.get().strip().replace(' ', '').lower()}'
                         """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
-            # connection.close()
-            # cursor.close()
+            commit(sql=sql)
+          
 
             ent1.delete(0,END)
             ent2.delete(0,END)
@@ -187,18 +174,14 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     set status='not available',serial='{serial}',name='-',agent_id='-',date='-'
                         where  lower(serial)='{serial.strip().replace(' ', '').lower()}' 
                             """)
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
             sql=(f"""
                     insert into serial_hestory (serial,agent_name,first_date,last_date)
                     VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
                             """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
             sql=(f"""
                 update serial_hestory 
@@ -206,9 +189,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     where  lower(serial)='{serial.strip().replace(' ', '').lower()}' and lower(agent_name)='{ent1.get().lower()}' 
                         """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
 
 
             sql=(f"""
@@ -217,9 +198,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     where lower(serial) ='{ent2.get().strip().replace(' ', '').lower()}'
                         """)
 
-            connection.commit()
-            cursor.execute(query=sql)
-            cursor.execute('commit')
+            commit(sql=sql)
             # connection.close()
             # cursor.close()
 
@@ -239,13 +218,9 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
     def check_but():
             
             dateText.grid_forget()
-            cl.headset_data=cl.headset_data
-            print(serial)
             m=ent2.get().strip().replace(' ', '').lower()
-            print(f'{m}') 
-            
+    
             new_serial=cl.headset_data[cl.headset_data['serial'].str.lower().isin([f'{m}'])]
-            print(new_serial)
             if ent2.get().strip().replace(" ","").lower()==serial.lower() :
                 existsText = CTkLabel(frame,text='''it's a same serial ''',font=font2,text_color='red')
                 existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
@@ -291,7 +266,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
         x=ent2.get().strip().replace(' ', '').lower()
 
         new_serial=cl.headset_data[cl.headset_data['serial'].str.lower().isin([f'{x}'])]
-        print(new_serial)
+      
         if ent1.get().lower() in list(cl.headset_data['status'].str.lower()):
             existsText = CTkLabel(frame,text='This name already exists',font=font2,text_color='red')
             existsText.grid(row=5, column=0,columnspan=2 , sticky="we", padx=12,pady=12)
@@ -306,9 +281,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                         where lower(serial) ='{ent2.get().strip().replace(' ', '').lower()}'
                             """)
 
-                connection.commit()
-                cursor.execute(query=sql)
-                cursor.execute('commit')
+                commit(sql=sql)
                 # connection.close()
                 # cursor.close()
                 sql=(f"""
@@ -316,9 +289,7 @@ def details_about(self,app,tabs ,frame="",american_name='',serial='',name='',id=
                     VALUES ('{ent2.get().strip().replace(' ', '')}','{ent1.get()}','{ent5.get().strip().replace(' ', '')}','-')
                             """)
 
-                connection.commit()
-                cursor.execute(query=sql)
-                cursor.execute('commit')
+                commit(sql=sql)
 
                 ent1.delete(0,END)
                 ent2.delete(0,END)

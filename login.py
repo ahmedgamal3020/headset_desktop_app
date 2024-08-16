@@ -81,8 +81,7 @@ def getmeframe(app,parent_hight,parent_width,frame=""):
     checkbox = CTkCheckBox(master=frame, 
                             text='Remember Me') 
     checkbox.grid(row=4,column=0,pady=12,padx=10) 
-    
-
+  
     return frame
 
 

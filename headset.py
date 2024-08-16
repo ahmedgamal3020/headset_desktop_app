@@ -27,9 +27,9 @@ class App(CTk):
         self.main_frame = login.getmeframe(self,self.parent_hight,self.parent_width)
         self.main_frame.pack(anchor='s',pady=self.parent_hight*1/6)
     
-
+    
 app = App()
-app.iconbitmap("assets\icon-headset_87991.ico")
+app.iconbitmap("assets/icon-headset_87991.ico")
 app.title('Headset System')
 app.resize_window()
 app.mainloop()
